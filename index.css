@@ -29,9 +29,10 @@ h1 {
 	box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
 	margin: 0 25px 25px 0;
 	font-size: 75px;
-	transition: transform 1s;
+	transition: transform 0.5s;
 	transform-style: preserve-3d;
-	position: relative;
+	/*position: relative;
+*/
 }
 
 .cardFace, .cardBack {
@@ -47,7 +48,7 @@ h1 {
 }
 
 .cardFace {
-	background-image: linear-gradient(to top right, white, white);
+	background-color: white;
 	transform: rotateY(180deg);
 
 }
@@ -56,10 +57,27 @@ h1 {
   transform: rotateY(180deg);
 }
 
+.cardFace.green {
+	background-color: #5dd55d;
 
+}
 
+.card.green {
+	border-color: #5dd55d;
+}
 
+.cardFace.red {
+	background-color: red;
 
+}
+
+.card.red {
+	border-color: red;
+}
+
+.card.avoid-clicks {
+  pointer-events: none;
+}
 
 
 
