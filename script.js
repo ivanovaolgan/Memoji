@@ -1,13 +1,18 @@
-/*Emoji array, length = 12 */
-/*var arr = ['\u{1F436}',  '\u{1F431}', '\u{1F42D}', '\u{1F439}', '\u{1F430}',
- '\u{1F43B}', '\u{1F436}',  '\u{1F431}', '\u{1F42D}', '\u{1F439}', '\u{1F430}', '\u{1F43B}'];
-*/
+/*-----------------------SET UP THA VARIABLES------------------------------------------- */
 var emojiArr = ["🐶", "🐱", "🐭", "🐹", "🐰", "🐻", "🐼", "🐨", "🐯", "🦁",
 		 "🐮", "🐷", "🐸", "🐙", "🐵", "🦄", "🐞", "🦀", "🐟", "🐊", "🐓", "🦃", "🐿"];
 const emCount = 6;
 var arr = aRandom(emojiArr).splice(0,emCount); // take first emCount elements from shuffled emoji array
 const winColor = 'green';
 const loseColor = 'red';
+var countMin = 0;
+var countSec = 60; //starting point of game time counter
+var countTimeInSec = countMin*60 + countSec;
+var gameOutTime = 0; //in seconds
+var myT; //timer
+var modal = document.getElementById("winLose");
+var msgWord;
+
 
 /*------------------------PREPARE EMOJI ARRAY FOR CARDS----------------------------------*/
 /* Get random integer from 0 to max exclusive*/
@@ -28,7 +33,7 @@ function aRandom(arr) {
 }
 // add color to background
 function foundTwins(elements, color) {
-	console.log('foundTwins');
+	//console.log('foundTwins');
 	var l = elements.length;
 	for (i=0; i<2; i++) {
 		elements[i].classList.add(color, 'twin'); 
@@ -36,9 +41,8 @@ function foundTwins(elements, color) {
 	}
 } 
 
-//
+// leave open two identical cards or close them(if they are different)
 function firstTwoGameOut(elements){
-	console.log('firstTwoGameOut');
 	var idenTwin = [];
 	elements.forEach((n,i) => {
 		if (n.classList.contains('twin')) {
@@ -48,30 +52,75 @@ function firstTwoGameOut(elements){
 	idenTwin.forEach((n,i) => {
 		if (n.classList.contains(winColor)) {
 			n.parentNode.classList.remove('compare');	
-			console.log(n.textContent, n.parentNode.classList);
 		} else {
 			n.classList.remove(loseColor, 'twin');
 			n.parentNode.classList.remove(loseColor,'compare', 'avoid-clicks', 'is-flipped');
-			console.log(n.textContent, n.parentNode.classList);
 		  }
 		}
 	)
 
 }
 
+function checkTime(i) {
+  if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+  return i;
+}
+
+function gameStart(){
+	myT = setInterval(gameTimer, 1000);
+}
+
+function gameStop(){
+	clearInterval(myT);
+}
+
+function gameTimer(){
+	
+	countMin = Math.floor(countTimeInSec / 60);
+	countSec = countTimeInSec % 60;
+	countTimeInSec--;
+	document.getElementById('timer').textContent = checkTime(countMin) +':'+ checkTime(countSec);
+	if (countTimeInSec == gameOutTime){ 
+		gameStop();
+		gameMsg('Lose');
+	}
+
+}
+/*------------------------ MODAL FORM*/
+function gameMsg (msgWord){
+	msgWord = msgWord;
+	modal.style.display ='block';
+	var wordArray = msgWord.split('');
+	var elem = document.createElement('span');
+	elem.className = 'modal-msg-word'; 
+	for (var i = 0; i < wordArray.length; i++) {
+			elem.textContent = wordArray[i];
+			document.querySelector('.modal-msg').appendChild(elem);
+			setTimeout(function (elem) { 
+					return function() { elem.classList.add('wave');}
+				}(elem), (i*150));
+			elem = elem.cloneNode(true);
+	}
+}
+
+	
 /* Greate shuffled array */
 var arrRandom = aRandom(arr.concat(arr));
 console.log(arrRandom);
 
 /* Add shuffled images to cards */
 document.querySelectorAll('.cardFace').forEach((n, i) => n.textContent = arrRandom[i])
+gameTimer();
 
 
 /*------------------------ FLIP THE CARD AND IDENTIFY TWINS*/
 /* Flip the card*/
 var cardSet = document.querySelector('.cardSet');
-var compareCount = 0;
-cardSet.addEventListener( 'click', function(event) { 	
+var clickCount = 0;
+cardSet.addEventListener( 'click', function(event) { 
+		if (clickCount == 0) {
+			gameStart();}
+		clickCount++;	
 	 	let element = event.target;
 	 	let card = element.parentNode;
  		card.classList.toggle('is-flipped');
@@ -79,23 +128,28 @@ cardSet.addEventListener( 'click', function(event) {
  		
  		
  		var cardsToCompare = cardSet.querySelectorAll('.card.compare .cardFace');
- 		console.log(cardsToCompare)
-	
+
+//--Step 1	
 if (cardsToCompare.length == 2 ) {
 	if (cardsToCompare[0].textContent == cardsToCompare[1].textContent) {
 		foundTwins(cardsToCompare, winColor);
-		console.log(cardsToCompare[0].parentNode.classList);
-		console.log(cardsToCompare[1].parentNode.classList);
 	} else {
 		foundTwins(cardsToCompare, loseColor);
-		console.log(cardsToCompare[0].parentNode.classList);
-		console.log(cardsToCompare[1].parentNode.classList);
 	}
 }
+
+//--Step 2
 if (cardsToCompare.length == 3) {
 	firstTwoGameOut(Array.prototype.slice.call(cardsToCompare));
 }	
 
+//--Step 3
+var cardsCount = cardSet.querySelectorAll('.card .cardFace.green.twin');
+
+if (cardsCount.length == emCount*2) { 
+	gameStop();
+	setTimeout(gameMsg('Win'), 2000);
+	}
 
 }, true);
 
