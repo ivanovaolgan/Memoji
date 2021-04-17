@@ -12,6 +12,8 @@ var gameOutTime = 0; //in seconds
 var myT; //timer
 var modal = document.getElementById("winLose");
 var msgWord;
+var wordWin = 'Win';
+var wordLose = 'Lose';
 
 
 /*------------------------PREPARE EMOJI ARRAY FOR CARDS----------------------------------*/
@@ -61,11 +63,13 @@ function firstTwoGameOut(elements){
 
 }
 
+// show seconds or minutes in format 01:09 instead of 1:9
 function checkTime(i) {
   if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
   return i;
 }
 
+//
 function gameStart(){
 	myT = setInterval(gameTimer, 1000);
 }
@@ -82,11 +86,12 @@ function gameTimer(){
 	document.getElementById('timer').textContent = checkTime(countMin) +':'+ checkTime(countSec);
 	if (countTimeInSec == gameOutTime){ 
 		gameStop();
-		gameMsg('Lose');
+		gameMsg(wordLose);
 	}
 
 }
 /*------------------------ MODAL FORM*/
+// make message at the end of the game jumping
 function gameMsg (msgWord){
 	msgWord = msgWord;
 	modal.style.display ='block';
@@ -103,7 +108,7 @@ function gameMsg (msgWord){
 	}
 }
 
-	
+/*--------------------------UPLOAD PAGE -----*/	
 /* Greate shuffled array */
 var arrRandom = aRandom(arr.concat(arr));
 console.log(arrRandom);
@@ -148,8 +153,11 @@ var cardsCount = cardSet.querySelectorAll('.card .cardFace.green.twin');
 
 if (cardsCount.length == emCount*2) { 
 	gameStop();
-	setTimeout(gameMsg('Win'), 2000);
+	setTimeout(gameMsg(wordWin), 2000);
 	}
 
 }, true);
 
+document.getElementById('btnPlayAgain').onclick = function(){
+	window.location.reload();
+};
